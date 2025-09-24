@@ -30,14 +30,14 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat formatter = NumberFormat.simpleCurrency(
-        decimalDigits: 0, locale: Localizations.localeOf(context).toString());
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final ThemeData theme = Theme.of(context);
 
     final imageWidget = Image.asset(
       product.assetName,
       package: product.assetPackage,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
     );
 
     return Column(
@@ -53,7 +53,7 @@ class ProductCard extends StatelessWidget {
           width: 121.0,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 product.name,

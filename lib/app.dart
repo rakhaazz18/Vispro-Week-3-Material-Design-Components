@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-
+import 'colors.dart' as shrine_colors;
 import 'home.dart';
 import 'login.dart';
+import 'supplemental/cut_corners_border.dart';
 
 // TODO: Convert ShrineApp to stateful widget (104)
 class ShrineApp extends StatelessWidget {
@@ -35,10 +36,69 @@ class ShrineApp extends StatelessWidget {
         // TODO: Change backLayer field value to CategoryMenuPage (104)
       },
       // TODO: Customize the theme (103)
-      theme: ThemeData.light(useMaterial3: true),
+      theme: _kShrineTheme, // New code
     );
   }
 }
 
 // TODO: Build a Shrine Theme (103)
+final ThemeData _kShrineTheme = _buildShrineTheme();
+
+ThemeData _buildShrineTheme() {
+  final ThemeData base = ThemeData.light(useMaterial3: true);
+  return base.copyWith(
+    colorScheme: base.colorScheme.copyWith(
+      primary: shrine_colors.kShrinePink100,
+      onPrimary: shrine_colors.kShrineBrown900,
+      secondary: shrine_colors.kShrineBrown900,
+      error: shrine_colors.kShrineErrorRed,
+    ),
+    scaffoldBackgroundColor: shrine_colors.kShrineSurfaceWhite,
+    textTheme: _buildShrineTextTheme(base.textTheme),
+    textSelectionTheme: const TextSelectionThemeData(
+      selectionColor: shrine_colors.kShrinePink100,
+    ),
+    appBarTheme: const AppBarTheme(
+      foregroundColor: shrine_colors.kShrineBrown900,
+      backgroundColor: shrine_colors.kShrinePink100,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      border: const CutCornersBorder(),
+      focusedBorder: CutCornersBorder(
+        borderSide: BorderSide(
+          width: 2.0,
+          color: shrine_colors.kShrinePink100,
+        ),
+      ),
+      floatingLabelStyle: const TextStyle(
+        color: shrine_colors.kShrinePink100,
+      ),
+    ),
+  );
+}
+
 // TODO: Build a Shrine Text Theme (103)
+TextTheme _buildShrineTextTheme(TextTheme base) {
+  return base
+      .copyWith(
+        headlineSmall: base.headlineSmall!.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        titleLarge: base.titleLarge!.copyWith(
+          fontSize: 18.0,
+        ),
+        bodySmall: base.bodySmall!.copyWith(
+          fontWeight: FontWeight.w400,
+          fontSize: 14.0,
+        ),
+        bodyLarge: base.bodyLarge!.copyWith(
+          fontWeight: FontWeight.w500,
+          fontSize: 16.0,
+        ),
+      )
+      .apply(
+        fontFamily: 'Rubik',
+        displayColor: shrine_colors.kShrineBrown900,
+        bodyColor: shrine_colors.kShrineBrown900,
+      );
+}

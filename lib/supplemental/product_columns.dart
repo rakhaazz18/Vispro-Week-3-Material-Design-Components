@@ -41,7 +41,7 @@ class TwoProductCardColumn extends StatelessWidget {
       // TODO: Replace Column with a ListView (104)
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
             padding: const EdgeInsetsDirectional.only(start: 28.0),
