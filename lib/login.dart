@@ -13,14 +13,8 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-// Add this import if kShrinePink100 is defined in colors.dart
-import 'colors.dart';
-
-// Luxury Black & Gold Colors
-const kLuxuryBlack = Color(0xFF0A0A0A);
-const kLuxuryGold = Color(0xFFD4AF37);
-const kLuxuryWhite = Color(0xFFFFFFFF);
-const kLuxuryGray = Color(0xFF1A1A1A);
+// Use centralized color constants
+import 'colors.dart' as app_colors;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -37,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kLuxuryBlack,
+      backgroundColor: app_colors.kLuxuryBlack,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -49,23 +43,31 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   padding: const EdgeInsets.all(24.0),
                   decoration: BoxDecoration(
-                    color: kLuxuryGray,
+                    color: app_colors.kLuxuryGray,
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
-                      color: kLuxuryGold,
+                      color: app_colors.kLuxuryGold,
                       width: 2.0,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: kLuxuryGold.withOpacity(0.3),
+                        color: app_colors.kLuxuryGold.withOpacity(0.3),
                         blurRadius: 20.0,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Image.asset(
-                    'assets/Img Logo/Logo FunkyFit.png', 
-                    height: 80
+                  child: ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      app_colors.kLuxuryWhite,
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      'assets/Img Logo/Logo FunkyFit.png',
+                      height: 80,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24.0),
@@ -74,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     letterSpacing: 4.0,
                     fontWeight: FontWeight.bold,
-                    color: kLuxuryGold,
+                    color: app_colors.kLuxuryGold,
                   ),
                 ),
               ],
@@ -83,28 +85,28 @@ class _LoginPageState extends State<LoginPage> {
             // Username field
             TextField(
               controller: _usernameController,
-              style: TextStyle(color: kLuxuryWhite, fontSize: 15.0),
+              style: TextStyle(color: app_colors.kLuxuryWhite, fontSize: 15.0),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: kLuxuryGray,
+                fillColor: app_colors.kLuxuryGray,
                 labelText: 'Username',
                 labelStyle: TextStyle(
-                  color: kLuxuryWhite.withOpacity(0.6),
+                  color: app_colors.kLuxuryWhite.withOpacity(0.6),
                   fontWeight: FontWeight.w300,
                   letterSpacing: 0.5,
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGray),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGray, width: 1.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGold, width: 2.0),
-                ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGray),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGray, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGold, width: 2.0),
+                  ),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 18.0),
               ),
@@ -114,28 +116,28 @@ class _LoginPageState extends State<LoginPage> {
             TextField(
               controller: _passwordController,
               obscureText: true,
-              style: TextStyle(color: kLuxuryWhite, fontSize: 15.0),
+              style: TextStyle(color: app_colors.kLuxuryWhite, fontSize: 15.0),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: kLuxuryGray,
+                fillColor: app_colors.kLuxuryGray,
                 labelText: 'Password',
                 labelStyle: TextStyle(
-                  color: kLuxuryWhite.withOpacity(0.6),
+                  color: app_colors.kLuxuryWhite.withOpacity(0.6),
                   fontWeight: FontWeight.w300,
                   letterSpacing: 0.5,
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGray),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGray, width: 1.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(color: kLuxuryGold, width: 2.0),
-                ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGray),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGray, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(color: app_colors.kLuxuryGold, width: 2.0),
+                  ),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 18.0),
               ),
@@ -149,18 +151,18 @@ class _LoginPageState extends State<LoginPage> {
                 // TODO: Add buttons (101)
                 TextButton(
                   child: Text(
-                    'CANCEL',
-                    style: TextStyle(
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.w400,
+                      'CANCEL',
+                      style: TextStyle(
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
                   onPressed: () {
                     _usernameController.clear();
                     _passwordController.clear();
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: kLuxuryWhite.withOpacity(0.7),
+                    foregroundColor: app_colors.kLuxuryWhite.withOpacity(0.7),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24.0, 
                       vertical: 12.0
@@ -177,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(
                         letterSpacing: 1.5,
                         fontWeight: FontWeight.bold,
-                        color: kLuxuryBlack,
+                        color: app_colors.kLuxuryBlack,
                       ),
                     ),
                     onPressed: () {
@@ -185,10 +187,10 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: kLuxuryBlack,
-                      backgroundColor: kLuxuryGold,
+                      foregroundColor: app_colors.kLuxuryBlack,
+                      backgroundColor: app_colors.kLuxuryGold,
                       elevation: 6.0,
-                      shadowColor: kLuxuryGold.withOpacity(0.5),
+                      shadowColor: app_colors.kLuxuryGold.withOpacity(0.5),
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
