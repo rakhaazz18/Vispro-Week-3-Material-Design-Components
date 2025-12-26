@@ -248,6 +248,21 @@ class _BackdropState extends State<Backdrop>
           },
         ),
       ],
+      // Add a thin luxury gold separator between the top bar and the front layer
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(4.0),
+        child: Container(
+          height: 4.0,
+          // Use a subtle gold gradient for a luxury accent
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [app_colors.kLuxuryGoldLight, app_colors.kLuxuryGoldDark],
+            ),
+          ),
+        ),
+      ),
     );
     return Scaffold(
       appBar: appBar,
