@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
 import 'colors.dart' as shrine_colors;
 import 'home.dart';
 import 'login.dart';
@@ -20,6 +22,9 @@ import 'supplemental/cut_corners_border.dart';
 import 'backdrop.dart';
 import 'model/product.dart';
 import 'supplemental/category_menu_page.dart';
+import 'product_detail.dart';
+import 'cart.dart';
+import 'about.dart';
 
 
 // TODO: Convert ShrineApp to stateful widget (104)
@@ -32,6 +37,9 @@ class ShrineApp extends StatefulWidget {
 
 class _ShrineAppState extends State<ShrineApp> {
   Category _currentCategory = Category.all;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  static const MethodChannel _channel = MethodChannel('app.channel.shared.data');
+  StreamSubscription? _sub; // not used but keep for compatibility
 
   void _onCategoryTap(Category category) {
     setState(() {
@@ -42,17 +50,14 @@ class _ShrineAppState extends State<ShrineApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shrine',
-      initialRoute: '/login',
+      navigatorKey: _navigatorKey,
+      title: 'ShopMate',
+      initialRoute: '/',
       routes: {
         '/login': (BuildContext context) => const LoginPage(),
-        // TODO: Change to a Backdrop with a HomePage frontLayer (104)
         '/': (BuildContext context) => Backdrop(
-              // TODO: Make currentCategory field take _currentCategory (104)
               currentCategory: _currentCategory,
-              // TODO: Pass _currentCategory for frontLayer (104)
               frontLayer: HomePage(category: _currentCategory),
-              // TODO: Change backLayer field value to CategoryMenuPage (104)
               backLayer: CategoryMenuPage(
                 currentCategory: _currentCategory,
                 onCategoryTap: _onCategoryTap,
@@ -60,11 +65,54 @@ class _ShrineAppState extends State<ShrineApp> {
               frontTitle: const Text('FUNKYFIT'),
               backTitle: const Text('MENU'),
             ),
-
-          },
-      // TODO: Customize the theme (103)
-      theme: _kShrineTheme, // New code
+        '/cart': (BuildContext context) => const CartScreen(),
+        '/about': (BuildContext context) => const AboutScreen(),
+        '/product': (BuildContext context) {
+          final args = ModalRoute.of(context)!.settings.arguments;
+          return ProductDetailScreen(productId: args is int ? args : int.tryParse(args?.toString() ?? '') );
+        },
+      },
+      theme: _kShrineTheme,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Handle initial link if app was cold-started from a deep link
+    _initPlatformLinks();
+  }
+  Future<void> _initPlatformLinks() async {
+    // Listen for method channel calls from Android MainActivity
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'initialLink' || call.method == 'newLink') {
+        final String? uriString = call.arguments as String?;
+        if (uriString != null) _handleIncomingUri(Uri.parse(uriString));
+      }
+      return null;
+    });
+
+    // Try to get initial link synchronously if possible
+    try {
+      final initial = await _channel.invokeMethod<String>('getInitialLink');
+      if (initial != null) _handleIncomingUri(Uri.parse(initial));
+    } catch (_) {}
+  }
+
+  void _handleIncomingUri(Uri uri) {
+    if (uri.host == 'product') {
+      final idSegment = uri.pathSegments.isNotEmpty ? uri.pathSegments[0] : null;
+      final id = idSegment != null ? int.tryParse(idSegment) : null;
+      if (id != null) {
+        _navigatorKey.currentState?.pushNamed('/product', arguments: id);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }
 
@@ -80,14 +128,12 @@ ThemeData _buildShrineTheme() {
       secondary: shrine_colors.kLuxuryGoldDark,
       error: shrine_colors.kShrineErrorRed,
       surface: shrine_colors.kLuxuryGray,
-      background: shrine_colors.kLuxuryBlack,
-      onBackground: shrine_colors.kLuxuryWhite,
       onSurface: shrine_colors.kLuxuryWhite,
     ),
     scaffoldBackgroundColor: shrine_colors.kLuxuryBlack,
     textTheme: _buildShrineTextTheme(base.textTheme),
     textSelectionTheme: TextSelectionThemeData(
-      selectionColor: shrine_colors.kLuxuryGold.withOpacity(0.3),
+      selectionColor: shrine_colors.kLuxuryGold.withAlpha(77),
       cursorColor: shrine_colors.kLuxuryGold,
     ),
     appBarTheme: const AppBarTheme(
@@ -96,32 +142,32 @@ ThemeData _buildShrineTheme() {
       elevation: 0,
       iconTheme: IconThemeData(color: shrine_colors.kLuxuryWhite),
     ),
-    inputDecorationTheme: InputDecorationTheme(
-      border: const CutCornersBorder(),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: CutCornersBorder(),
       focusedBorder: CutCornersBorder(
         borderSide: BorderSide(
           width: 2.0,
           color: shrine_colors.kLuxuryGold,
         ),
       ),
-      floatingLabelStyle: const TextStyle(
+      floatingLabelStyle: TextStyle(
         color: shrine_colors.kLuxuryGold,
       ),
     ),
     cardTheme: CardThemeData(
       color: shrine_colors.kLuxuryGray,
       elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.5),
+      shadowColor: Colors.black.withAlpha(128),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
+        style: ElevatedButton.styleFrom(
         backgroundColor: shrine_colors.kLuxuryGold,
         foregroundColor: shrine_colors.kLuxuryBlack,
         elevation: 4,
-        shadowColor: shrine_colors.kLuxuryGold.withOpacity(0.3),
+        shadowColor: shrine_colors.kLuxuryGold.withAlpha(77),
       ),
     ),
   );
@@ -154,7 +200,7 @@ TextTheme _buildShrineTextTheme(TextTheme base) {
         bodySmall: base.bodySmall!.copyWith(
           fontWeight: FontWeight.w300,
           fontSize: 14.0,
-          color: shrine_colors.kLuxuryWhite.withOpacity(0.7),
+          color: shrine_colors.kLuxuryWhite.withAlpha(179),
         ),
         bodyLarge: base.bodyLarge!.copyWith(
           fontWeight: FontWeight.w400,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
 import 'model/product.dart';
 import 'colors.dart' as app_colors;
 
@@ -236,13 +235,7 @@ class _BackdropState extends State<Backdrop>
             semanticLabel: 'search',
           ),
           onPressed: () {
-            // TODO: Add open login (104)
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => const LoginPage(),
-              ),
-            );
+            Navigator.pushNamed(context, '/login');
           },
         ),
         IconButton(
@@ -251,20 +244,49 @@ class _BackdropState extends State<Backdrop>
             semanticLabel: 'filter',
           ),
           onPressed: () {
-            // TODO: Add open login (104)
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => const LoginPage(),
-              ),
-            );
+            Navigator.pushNamed(context, '/login');
           },
         ),
       ],
     );
     return Scaffold(
       appBar: appBar,
-      // TODO: Return a LayoutBuilder widget (104)
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.black),
+              child: Text('Menu', style: TextStyle(color: Colors.white)),
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.shopping_cart),
+              title: const Text('Cart'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/cart');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, '/about');
+              },
+            ),
+          ],
+        ),
+      ),
+      // Layout for the backdrop front/back layers
       body: LayoutBuilder(builder: _buildStack),
     );
   }

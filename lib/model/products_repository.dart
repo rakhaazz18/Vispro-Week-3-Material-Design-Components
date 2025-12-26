@@ -292,4 +292,13 @@ class ProductsRepository {
       }).toList();
     }
   }
+
+  static Product? findById(int id) {
+    final all = loadProducts(Category.all);
+    try {
+      return all.firstWhere((p) => p.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }

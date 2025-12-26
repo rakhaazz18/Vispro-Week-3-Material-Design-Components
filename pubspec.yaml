@@ -8,6 +8,7 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.17.0
+  # deep linking handled via platform MethodChannel in MainActivity
 
   cupertino_icons: ^1.0.5
 

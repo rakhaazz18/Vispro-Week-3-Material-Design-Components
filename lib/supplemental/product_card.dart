@@ -41,9 +41,13 @@ class ProductCard extends StatelessWidget {
       fit: BoxFit.cover,
     );
 
-    return Card(
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/product', arguments: product.id);
+      },
+      child: Card(
       elevation: 4.0,
-      shadowColor: Colors.black.withOpacity(0.8),
+      shadowColor: Colors.black.withAlpha(204),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
@@ -110,6 +114,7 @@ class ProductCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
