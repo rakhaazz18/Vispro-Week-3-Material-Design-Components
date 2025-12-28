@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'model/products_repository.dart';
 import 'model/product.dart';
+import 'model/cart_model.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final int? productId;
@@ -47,7 +49,17 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to cart (demo)')));
+                // add product to cart model
+                Provider.of<CartModel>(context, listen: false).add(product);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Added to cart'),
+                    action: SnackBarAction(
+                      label: 'View cart',
+                      onPressed: () => Navigator.pushNamed(context, '/cart'),
+                    ),
+                  ),
+                );
               },
               child: const Text('Add to cart'),
             ),

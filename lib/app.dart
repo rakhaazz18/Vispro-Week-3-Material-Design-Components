@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'model/cart_model.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'colors.dart' as shrine_colors;
@@ -49,30 +51,33 @@ class _ShrineAppState extends State<ShrineApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: _navigatorKey,
-      title: 'ShopMate',
-      initialRoute: '/',
-      routes: {
-        '/login': (BuildContext context) => const LoginPage(),
-        '/': (BuildContext context) => Backdrop(
-              currentCategory: _currentCategory,
-              frontLayer: HomePage(category: _currentCategory),
-              backLayer: CategoryMenuPage(
+    return ChangeNotifierProvider(
+      create: (_) => CartModel(),
+      child: MaterialApp(
+        navigatorKey: _navigatorKey,
+        title: 'FunkyFit',
+        initialRoute: '/login',
+        routes: {
+          '/login': (BuildContext context) => const LoginPage(),
+          '/': (BuildContext context) => Backdrop(
                 currentCategory: _currentCategory,
-                onCategoryTap: _onCategoryTap,
+                frontLayer: HomePage(category: _currentCategory),
+                backLayer: CategoryMenuPage(
+                  currentCategory: _currentCategory,
+                  onCategoryTap: _onCategoryTap,
+                ),
+                frontTitle: const Text('FUNKYFIT'),
+                backTitle: const Text('MENU'),
               ),
-              frontTitle: const Text('FUNKYFIT'),
-              backTitle: const Text('MENU'),
-            ),
-        '/cart': (BuildContext context) => const CartScreen(),
-        '/about': (BuildContext context) => const AboutScreen(),
-        '/product': (BuildContext context) {
-          final args = ModalRoute.of(context)!.settings.arguments;
-          return ProductDetailScreen(productId: args is int ? args : int.tryParse(args?.toString() ?? '') );
+          '/cart': (BuildContext context) => const CartScreen(),
+          '/about': (BuildContext context) => const AboutScreen(),
+          '/product': (BuildContext context) {
+            final args = ModalRoute.of(context)!.settings.arguments;
+            return ProductDetailScreen(productId: args is int ? args : int.tryParse(args?.toString() ?? '') );
+          },
         },
-      },
-      theme: _kShrineTheme,
+        theme: _kShrineTheme,
+      ),
     );
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'model/product.dart';
+import 'package:provider/provider.dart';
+import 'model/cart_model.dart';
 import 'colors.dart' as app_colors;
 
 // TODO: Add velocity constant (104)
@@ -245,6 +247,40 @@ class _BackdropState extends State<Backdrop>
           ),
           onPressed: () {
             Navigator.pushNamed(context, '/login');
+          },
+        ),
+        // Cart button with badge
+        Consumer<CartModel>(
+          builder: (context, cart, _) {
+            final count = cart.items.length;
+            return IconButton(
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.shopping_cart),
+                  if (count > 0)
+                    Positioned(
+                      right: -6,
+                      top: -6,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                        child: Center(
+                          child: Text(
+                            '$count',
+                            style: const TextStyle(color: Colors.white, fontSize: 11),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              onPressed: () => Navigator.pushNamed(context, '/cart'),
+            );
           },
         ),
       ],

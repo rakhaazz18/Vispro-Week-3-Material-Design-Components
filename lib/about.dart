@@ -12,7 +12,7 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('ShopMate Demo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const Text('FunkyFit Demo', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             const Text('This app demonstrates navigation, named routes, and deep linking integration.'),
             const SizedBox(height: 12),

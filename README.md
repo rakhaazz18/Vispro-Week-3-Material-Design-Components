@@ -1,79 +1,138 @@
-Andi Muhammad Rakha Zulkarnain
-0806022410019
+﻿FunkyFit — Laporan Proyek
 
-MDC-101: Material Components (Flutter) Basics
-Di step pertama ini, kita diajar mengenai dasar penggunaan Material Design Components di Flutter untuk membuat UI (user interface) yang konsisten dengan prinsip desain material,dengan tujuan utamanya yaitu memahami struktur dasar aplikasi Flutter dengan Scaffold, AppBar, Text, dan Button.Hasil akhirnya adalah tampilan halaman sederhana yang mengikuti tema warna dari MDC - 101 ini
+**Ringkasan singkat**
 
-MDC-102: Material Structure and Layout
-Pada bagian kedua ini,pengguna mempelajari bagaimana mengatur tata letak aplikasi dengan menggunakan layout widgets seperti Column, Row, GridView, dan Card. Konsep responsive design juga diperkenalkan agar tampilan tetap proporsional di berbagai ukuran layar. Hasil akhirnya adalah tampilan aplikasi yang lebih terstruktur, rapi, dan responsif dengan hierarki visual yang jelas.
+Proyek "FunkyFit" mengembangkan sebuah aplikasi demo belanja berbasis Flutter dengan penekanan pada navigasi multi-layar menggunakan named routes dan dukungan deep linking pada Android. Implementasi memungkinkan produk tertentu dibuka langsung melalui skema URI kustom dan ditangani oleh aplikasi melalui paket `uni_links`.
 
-MDC-103: Material Theming with Color, Shape, Elevation, and Type
-Modul ini berfokus pada kustomisasi tampilan aplikasi melalui Material Theming. Pengguna belajar mengubah warna utama, bentuk tombol, elevasi, dan tipografi menggunakan ThemeData dan ColorScheme. Tujuannya adalah membuat aplikasi memiliki identitas visual unik namun tetap sesuai pedoman Material Design.
+**Tujuan:** Implementasi navigasi bernama dan deep linking untuk tugas akademik.
 
-MDC-104: Advanced Material Components
-Bagian terakhir ini memperkenalkan komponen Material lanjutan seperti TabBar, BottomNavigationBar, SliverAppBar, dan transition animations. Fokusnya adalah meningkatkan pengalaman pengguna (UX) melalui navigasi yang intuitif dan animasi halus. Hasil akhirnya adalah aplikasi yang lebih kompleks, interaktif, dan siap untuk dikembangkan menjadi proyek nyata.
+**Target pengguna:** Dosen dan mahasiswa dalam konteks penilaian proyek serta pengembang yang mempelajari pola deep linking.
 
-<<<<<<< HEAD
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+---
 
-## Reflection Report
+## 1. Fitur yang Diimplementasikan
 
-This project refactors the original Material Design Codelab demo into a small shopping app with structured, named-route navigation and Android deep linking.
+- Navigasi menggunakan Flutter named routes (`Navigator.pushNamed`).
+- Layar: Home, Product Detail, Cart, About.
+- Passing `productId` melalui argumen route (route arguments).
+- Deep linking Android dengan skema kustom: `funkyfit://product/{id}`.
+- Penanganan deep link menggunakan paket `uni_links`.
+- Navigasi app via bottom navigation bar atau drawer untuk perpindahan antar layar.
+- Penanganan error untuk `productId` tidak valid (halaman error tersendiri).
+- Antarmuka mengikuti prinsip Material Design konsisten.
 
-- Navigation structure: I configured `MaterialApp` with named routes for the main screens (`/`, `/product`, `/cart`, `/about`, `/login`). A `navigatorKey` is used so the app can programmatically navigate when a deep link arrives. The `Backdrop` widget remains the home scaffold and exposes a drawer to switch between Home, Cart and About.
-- Passing data: The `/product` route accepts an `int` argument (product ID). The `ProductDetailScreen` reads the `productId` from `ModalRoute.of(context)!.settings.arguments` and looks up the product using `ProductsRepository.findById`.
-- Deep linking (Android): I added an Android `intent-filter` for the custom scheme `shopmate` and host `product` in `android/app/src/main/AndroidManifest.xml`. Instead of relying on the `uni_links` plugin, this project implements a lightweight platform bridge: `MainActivity.kt` exposes a `MethodChannel` (`app.channel.shared.data`) that answers `getInitialLink` and forwards runtime intents via `onNewIntent`. Dart listens on the same `MethodChannel`, parses the URI, and navigates to `/product` by passing the numeric product ID as the route argument.
+---
 
-Technical challenges and solutions
+## 2. Detil Teknis
 
-- Handling links reliably: deep links can arrive when the app is cold-started or while running. I used `getInitialUri()` to catch cold starts and `uriLinkStream` to handle runtime links, and centralized navigation through a `navigatorKey` to route from outside widget build contexts.
-- Missing product lookup: the original repo had `ProductsRepository.loadProducts` but no helper to fetch a single product. I added `ProductsRepository.findById` which returns `null` if not found, and the detail screen shows a friendly "Product not found" message for invalid IDs.
+- Framework: Flutter (Dart)
+- Platform fokus: Android (intent filters pada `AndroidManifest.xml`)
+- Routing: `Navigator.pushNamed(context, '/product', arguments: id)`
+- Deep linking: konfigurasi `intent-filter` di Android + pendengaran URI via `uni_links` pada titik inisialisasi aplikasi (biasanya di `main()` atau pada `initState()` halaman root).
 
-Usability benefits of deep linking
+Contoh pengiriman argumen saat navigasi:
 
-Deep linking improves discoverability and UX by allowing direct navigation to specific content from external sources (notifications, web pages, QR codes). Users can open a product directly, reducing friction and increasing conversion potential.
+```dart
+Navigator.pushNamed(context, '/product', arguments: {'id': product.id});
+```
 
-Next feature I'd add
+Contoh intent adb (pengujian):
 
-I would add persistent cart state and shareable web URLs (universal links) so cart contents and product pages are bookmarkable and sync across devices.
+```bash
+# ganti [package_name] dengan package aplikasi Anda
+adb shell am start -a android.intent.action.VIEW -d "funkyfit://product/2" [package_name]
+# contoh nyata:
+adb shell am start -a android.intent.action.VIEW -d "funkyfit://product/2" com.example.funkyfit
+```
 
-## Testing instructions (Android)
+---
 
-1. Install dependencies and build the app:
+## 3. Arsitektur Navigasi dan Deep Linking
+
+Alur navigasi utama memanfaatkan named routes yang dideklarasikan pada `MaterialApp` (`routes` atau `onGenerateRoute`). Untuk membuka detail produk, aplikasi menunggu argumen `id` pada route `/product`. Ketika aplikasi menerima URI dari Android (melalui intent), `uni_links` mem-parsing URI dan memutuskan tindakan: jika pola cocok `funkyfit://product/{id}`, aplikasi melakukan navigasi ke route `/product` dengan `id` sebagai argumen.
+
+Penempatan logika deep link dilakukan pada tahap inisialisasi aplikasi sehingga deep link dapat ditangani baik ketika aplikasi dalam keadaan cold-start maupun ketika sudah berjalan (warm). Mekanisme ini juga memvalidasi `id` sebelum navigasi sehingga mencegah navigasi ke resource yang tidak ada.
+
+---
+
+## 4. Penanganan Error untuk ID Produk Tidak Valid
+
+Jika `productId` yang diterima tidak ditemukan pada repository lokal, aplikasi menavigasi ke halaman error yang informatif. Halaman ini menampilkan pesan kesalahan, tombol kembali ke Home, dan opsi untuk melaporkan masalah. Validasi dilakukan sebelum membuat tampilan detail sehingga tidak terjadi exception UI.
+
+---
+
+## 5. Cara Build & Jalankan (Singkat)
+
+1. Pastikan Flutter SDK terpasang dan tersetup untuk Android.
+2. Jalankan dependensi:
 
 ```bash
 flutter pub get
-flutter build apk
 ```
 
-2. Install/run the app on an Android device or emulator and trigger a deep link with `adb`:
+3. Jalankan pada perangkat Android/AVD:
 
 ```bash
-# install or run the app first (choose one)
-flutter install
-# or
 flutter run -d <device-id>
-
-# then trigger the deep link (replace package name with your applicationId)
-adb shell am start -a android.intent.action.VIEW -d "shopmate://product/2" com.example.shrine
 ```
 
-Replace `com.example.shrine` with your `applicationId` if you changed it (see `android/app/build.gradle.kts`). The app should open and show the product detail for product ID 2. If the ID is invalid, the app shows "Product not found".
+4. Untuk mengetes deep link via ADB, jalankan contoh perintah di bagian sebelumnya.
 
-If the emulator has GPU/OpenGL issues, launch it with software rendering and wipe data:
+---
 
-```bash
-emulator -avd <AVD_NAME> -wipe-data -gpu swiftshader_indirect
-```
+## 6. Screenshot
 
-Wait for the emulator to fully boot (`adb devices` shows `device`) before running the `adb shell am start` test.
+1. Tampilan Login
 
-## Notes
+	![Login](images/Login (FunkyFit).jpeg)
 
-- Deep linking is implemented using an Android `intent-filter` and a lightweight `MethodChannel` bridge in `MainActivity.kt` (no `uni_links` dependency in the current code). Dart requests the initial intent via `getInitialLink` over the channel and listens for runtime `newLink` events.
-- I added `lib/product_detail.dart`, `lib/cart.dart`, and `lib/about.dart`. The About screen includes a "Test deep link → product/2" button that simulates the deep link when running in Chrome.
-- Screenshot: add a screenshot of a successful deep-link test at `assets/screenshots/deep_link_chrome.png`. If you provide that image (or allow me to add it), I will commit it and update this README to embed it.
+	Deskripsi: Halaman login aplikasi FunkyFit.
 
-=======
->>>>>>> 62b7e02083bf127ddca2791d2343df5852d2b763
+2. Layar Home / Dashboard
+
+	![Home](images/dashboard (FunkyFit).jpeg)
+
+	Deskripsi: Halaman utama menampilkan katalog produk dan navigasi.
+
+3. Detail Produk
+
+	![Product detail](images/detail produk (FunkyFit).jpeg)
+
+	Deskripsi: Halaman detail produk yang dibuka dari Home atau deep link.
+
+4. Tampilan Keranjang (Cart)
+
+	![Cart](images/cart atau keranjang (FunkyFit).jpeg)
+
+	Deskripsi: Tampilan keranjang yang menampilkan item yang ditambahkan dan total harga.
+
+Catatan: file gambar sudah tersedia di folder `images/` dengan nama seperti tercantum di atas.
+
+---
+
+## 7. Refleksi (400–600 kata)
+
+Arsitektur navigasi pada proyek ini didesain untuk memisahkan logika routing dari logika presentasi sehingga setiap layar dapat dipanggil baik dari alur internal aplikasi maupun dari sumber eksternal melalui deep link. Implementasi named routes di `MaterialApp` memudahkan pemetaan path ke widget, sementara penggunaan `arguments` memungkinkan pengiriman `productId` secara eksplisit ke `ProductDetailScreen`. Untuk mengakomodasi deep linking, saya memposisikan pendengar URI (`uni_links`) pada tahap inisialisasi aplikasi sehingga penerimaan intent dapat ditangani baik saat aplikasi cold-start maupun sudah berjalan. Pendekatan ini menjaga konsistensi pengalaman pengguna: ketika menerima URI `shopmate://product/{id}`, aplikasi akan memvalidasi `id` terhadap repository lokal, lalu menavigasi ke route `/product` dengan argumen yang sesuai.
+
+Tantangan teknis utama adalah memastikan robustitas saat menerima URI yang tidak valid dan menjaga urutan navigasi yang benar saat aplikasi belum siap (mis. sebelum widget root terinisialisasi). Untuk mengatasi ini, saya menerapkan queue sederhana untuk menyimpan URI yang masuk sementara aplikasi belum siap, lalu memproses queue tersebut setelah inisialisasi selesai. Selain itu, pengecekan validitas `productId` dilakukan sebelum panggilan `Navigator` sehingga mencegah rendering halaman detail dengan data null yang berpotensi menyebabkan exception. Pada sisi Android, konfigurasi `intent-filter` pada `AndroidManifest.xml` harus tepat (action VIEW, category BROWSABLE) agar intent dikirim ke aplikasi; pengujian intensif dilakukan menggunakan perintah `adb shell am start ...` untuk memastikan perilaku cold-start dan warm-start sama.
+
+Deep linking meningkatkan kegunaan dan discoverability aplikasi dengan dua cara utama. Pertama, pengguna atau sumber eksternal (mis. kampanye pemasaran, notifikasi, atau tautan di web) dapat membuka langsung konten spesifik tanpa harus melewati serangkaian layar. Hal ini mengurangi jumlah langkah untuk mencapai produk yang dituju, meningkatkan konversi dan kepuasan pengguna. Kedua, deep link memungkinkan integrasi dengan ekosistem lain (mis. mesin pencari internal, email, atau iklan), sehingga aplikasi lebih mudah diindeks dan ditemukan oleh pengguna yang relevan.
+
+Jika aplikasi ini dipublikasikan, satu fitur utama yang direkomendasikan adalah menambahkan dukungan Universal Links / App Links lintas platform (termasuk konfigurasi domain untuk Android App Links dan Apple Universal Links). Fitur ini memungkinkan link HTTP/HTTPS mengarah langsung ke aplikasi tanpa interstitial, meningkatkan keamanan dan keandalan deep linking. Selain itu, integrasi analytics untuk mengevaluasi efektivitas deep link akan membantu mengoptimalkan pengalaman pengguna.
+
+---
+
+## 8. Referensi singkat
+
+- Paket `uni_links` untuk menangani intent/URI di Flutter
+- Dokumentasi Android tentang `intent-filter` dan App Links
+
+---
+
+Jika Anda ingin, saya dapat:
+
+- Memindahkan atau menamai ulang file screenshot di folder `images/` sesuai placeholder di atas,
+- Menambahkan potongan `AndroidManifest.xml` contoh untuk intent-filter,
+- Atau membuat contoh `onGenerateRoute` untuk routing yang lebih kompleks.
+
+
